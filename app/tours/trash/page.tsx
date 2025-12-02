@@ -1,25 +1,18 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import {
   getTours,
-  deleteTour,
-  type TourDetailResponse,
-  TourResponse,
+  restoreTour,
+  permanentDeleteTour,
+  type TourResponse,
 } from "@/app/api/tourApi";
 import Link from "next/link";
 import { toast } from "sonner";
 import { formatCurrency, formatDateTime } from "@/app/lib/utils";
-import {
-  FaFilter,
-  FaRotateLeft,
-  FaMagnifyingGlass,
-  FaPenToSquare,
-  FaTrashCan,
-} from "react-icons/fa6";
+import { FaRotateLeft, FaMagnifyingGlass, FaTrashCan } from "react-icons/fa6";
 
-export default function ToursPage() {
+export default function ToursTrashPage() {
   const [tours, setTours] = useState<TourResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -27,11 +20,6 @@ export default function ToursPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-
-  // Filters
-  const [statusFilter, setStatusFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [priceRangeFilter, setPriceRangeFilter] = useState("");
 
   const limit = 10;
 
@@ -44,28 +32,15 @@ export default function ToursPage() {
       setLoading(true);
       const offset = (currentPage - 1) * limit;
 
-      let priceFrom, priceTo;
-      if (priceRangeFilter === "under2m") {
-        priceTo = 2000000;
-      } else if (priceRangeFilter === "2m-4m") {
-        priceFrom = 2000000;
-        priceTo = 4000000;
-      } else if (priceRangeFilter === "4m-6m") {
-        priceFrom = 4000000;
-        priceTo = 6000000;
-      } else if (priceRangeFilter === "above6m") {
-        priceFrom = 6000000;
-      }
-
       const response = await getTours(
         offset,
         limit,
         null,
         searchTerm,
-        priceFrom,
-        priceTo,
         undefined,
-        1 // status = 1 (active tours only)
+        undefined,
+        undefined,
+        0 // status = 0 (deleted tours only)
       );
 
       setTours(response.data.tours);
@@ -95,116 +70,80 @@ export default function ToursPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa tour này?")) return;
+  const handleRestore = async (id: number) => {
+    if (!confirm("Bạn có chắc chắn muốn khôi phục tour này?")) return;
 
     try {
-      await deleteTour(id);
-      toast.success("Xóa tour thành công");
+      await restoreTour(id);
+      toast.success("Khôi phục tour thành công");
       fetchTours();
     } catch (error) {
-      console.error("Error deleting tour:", error);
-      toast.error("Không thể xóa tour");
+      console.error("Error restoring tour:", error);
+      toast.error("Không thể khôi phục tour");
     }
   };
 
-  const handleBulkAction = (action: string) => {
+  const handlePermanentDelete = async (id: number) => {
+    if (
+      !confirm(
+        "Bạn có chắc chắn muốn xóa vĩnh viễn tour này? Hành động này không thể hoàn tác!"
+      )
+    )
+      return;
+
+    try {
+      await permanentDeleteTour(id);
+      toast.success("Xóa vĩnh viễn tour thành công");
+      fetchTours();
+    } catch (error) {
+      console.error("Error permanently deleting tour:", error);
+      toast.error("Không thể xóa vĩnh viễn tour");
+    }
+  };
+
+  const handleBulkAction = async (action: string) => {
     if (selectedIds.length === 0) {
       toast.error("Vui lòng chọn ít nhất một tour");
       return;
     }
 
     switch (action) {
-      case "delete":
-        if (confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} tour?`)) {
-          // Implement bulk delete
-          toast.success("Đã xóa các tour đã chọn");
+      case "restore":
+        if (
+          confirm(`Bạn có chắc chắn muốn khôi phục ${selectedIds.length} tour?`)
+        ) {
+          try {
+            await Promise.all(selectedIds.map((id) => restoreTour(id)));
+            toast.success("Đã khôi phục các tour đã chọn");
+            fetchTours();
+            setSelectedIds([]);
+          } catch (error) {
+            toast.error("Không thể khôi phục một số tour");
+          }
         }
         break;
-      case "active":
-        // Implement bulk active
-        toast.success("Đã kích hoạt các tour đã chọn");
-        break;
-      case "inactive":
-        // Implement bulk inactive
-        toast.success("Đã tạm dừng các tour đã chọn");
+      case "permanent-delete":
+        if (
+          confirm(
+            `Bạn có chắc chắn muốn xóa vĩnh viễn ${selectedIds.length} tour? Hành động này không thể hoàn tác!`
+          )
+        ) {
+          try {
+            await Promise.all(selectedIds.map((id) => permanentDeleteTour(id)));
+            toast.success("Đã xóa vĩnh viễn các tour đã chọn");
+            fetchTours();
+            setSelectedIds([]);
+          } catch (error) {
+            toast.error("Không thể xóa vĩnh viễn một số tour");
+          }
+        }
         break;
     }
   };
 
-  const resetFilters = () => {
-    setStatusFilter("");
-    setCategoryFilter("");
-    setPriceRangeFilter("");
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
-
   return (
     <>
-      <h1 className="box-title">Quản lý tour</h1>
-
-      {/* Filters Section */}
-      <div className="section-4">
-        <div className="inner-wrap">
-          <div className="inner-item inner-label">
-            <FaFilter /> Bộ lọc
-          </div>
-
-          <div className="inner-item">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">Trạng thái</option>
-              <option value="active">Hoạt động</option>
-              <option value="inactive">Tạm dừng</option>
-            </select>
-          </div>
-
-          <div className="inner-item">
-            <select>
-              <option value="">Người tạo</option>
-              <option value="">Lê Văn A</option>
-              <option value="">Lê Văn B</option>
-            </select>
-          </div>
-
-          <div className="inner-item">
-            <input type="date" />
-            <span>-</span>
-            <input type="date" />
-          </div>
-
-          <div className="inner-item">
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
-              <option value="">Danh mục</option>
-              <option value="1">Danh mục 1</option>
-              <option value="2">Danh mục 2</option>
-            </select>
-          </div>
-
-          <div className="inner-item">
-            <select
-              value={priceRangeFilter}
-              onChange={(e) => setPriceRangeFilter(e.target.value)}
-            >
-              <option value="">Mức giá</option>
-              <option value="under2m">Dưới 2tr</option>
-              <option value="2m-4m">Từ 2tr đến 4tr</option>
-              <option value="4m-6m">Từ 4tr đến 6tr</option>
-              <option value="above6m">Trên 6tr</option>
-            </select>
-          </div>
-
-          <div className="inner-item inner-reset" onClick={resetFilters}>
-            <FaRotateLeft /> Xóa bộ lọc
-          </div>
-        </div>
-      </div>
+      <h1 className="box-title">Thùng rác tour</h1>
 
       {/* Actions Section */}
       <div className="section-5">
@@ -212,17 +151,18 @@ export default function ToursPage() {
           <div className="inner-change-status">
             <div className="inner-item">
               <select
-                onChange={(e) => handleBulkAction(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleBulkAction(e.target.value);
+                    e.target.value = "";
+                  }
+                }}
                 defaultValue=""
               >
                 <option value="">-- Hành động --</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Dừng hoạt động</option>
-                <option value="delete">Xóa</option>
+                <option value="restore">Khôi phục</option>
+                <option value="permanent-delete">Xóa vĩnh viễn</option>
               </select>
-            </div>
-            <div className="inner-item">
-              <button>Áp dụng</button>
             </div>
           </div>
 
@@ -236,12 +176,8 @@ export default function ToursPage() {
             />
           </div>
 
-          <Link className="inner-button-create" href="/tours/create">
-            + Tạo mới
-          </Link>
-
-          <Link className="inner-button-trash" href="/tours/trash">
-            Thùng rác
+          <Link className="inner-button-create" href="/tours">
+            Quay lại danh sách
           </Link>
         </div>
       </div>
@@ -292,17 +228,17 @@ export default function ToursPage() {
                   <th className="text-center">Ảnh đại diện</th>
                   <th className="text-left">Giá</th>
                   <th className="text-left">Còn lại</th>
-                  <th className="text-left">Trạng thái</th>
+                  <th className="text-center">Trạng thái</th>
                   <th className="text-center">Tạo bởi</th>
-                  <th className="text-center">Cập nhật bởi</th>
+                  <th className="text-center">Xóa bởi</th>
                   <th className="text-left">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {tours.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-4">
-                      Không có tour nào
+                    <td colSpan={9} className="text-center py-4">
+                      Không có tour nào trong thùng rác
                     </td>
                   </tr>
                 ) : (
@@ -333,7 +269,7 @@ export default function ToursPage() {
                         {tour.imageUrl && (
                           <img
                             className="inner-avatar"
-                            src={tour.imageUrl}
+                            src={`http://localhost:8088/api/tours/images/${tour.imageUrl}`}
                             alt={tour.name}
                           />
                         )}
@@ -349,9 +285,7 @@ export default function ToursPage() {
                         <div>EB: {tour.remainInfant}</div>
                       </td>
                       <td className="text-center">
-                        <div className="badge badge-green">
-                          {tour.status ? "Hoạt động" : "Tạm dừng"}
-                        </div>
+                        <div className="badge badge-red">Đã xóa</div>
                       </td>
                       <td className="text-center">
                         <div>{tour.createdBy}</div>
@@ -367,20 +301,27 @@ export default function ToursPage() {
                       </td>
                       <td className="text-left">
                         <div className="box-actions">
-                          <Link
-                            className="inner-edit"
-                            href={`/tours/edit/${tour.id}`}
-                          >
-                            <FaPenToSquare />
-                          </Link>
                           <button
-                            className="inner-remove"
-                            onClick={() => handleDelete(tour.id)}
+                            className="inner-edit"
+                            onClick={() => handleRestore(tour.id)}
                             style={{
                               border: "none",
                               background: "none",
                               cursor: "pointer",
                             }}
+                            title="Khôi phục"
+                          >
+                            <FaRotateLeft />
+                          </button>
+                          <button
+                            className="inner-remove"
+                            onClick={() => handlePermanentDelete(tour.id)}
+                            style={{
+                              border: "none",
+                              background: "none",
+                              cursor: "pointer",
+                            }}
+                            title="Xóa vĩnh viễn"
                           >
                             <FaTrashCan />
                           </button>

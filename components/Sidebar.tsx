@@ -16,7 +16,7 @@ import {
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-64 h-screen border-r border-gray-300  bg-white px-4 py-6 flex flex-col gap-6">
+    <aside className="w-64 h-full border-r border-gray-300  bg-white px-4 py-6 flex flex-col gap-6">
 
   
 

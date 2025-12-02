@@ -1,46 +1,11 @@
 import OrderRow from "./OrderRow";
+import type { Booking } from "@/app/api/bookingApi";
 
-export default function OrderTable() {
-  const data = [
-    {
-      code: "OD0000001",
-      customer: {
-        name: "Lê Văn A",
-        phone: "0123456789",
-        note: "Test...",
-      },
-      tours: [
-        {
-          name: "Tour Hạ Long",
-          image: "/tour.jpg",
-          adult: "3 x 1.500.000đ",
-          child: "2 x 1.300.000đ",
-          baby: "2 x 1.000.000đ",
-        },
-        {
-          name: "Tour Hạ Long",
-          image: "/tour.jpg",
-          adult: "3 x 1.500.000đ",
-          child: "2 x 1.300.000đ",
-          baby: "2 x 1.000.000đ",
-        },
-      ],
-      payment: {
-        total: "10.000.000đ",
-        discount: "400.000đ",
-        code: "TOURMUAHE2024",
-        final: "9.600.000đ",
-        method: "Ví Momo",
-        status: "Đã thanh toán",
-      },
-      status: "Khởi tạo",
-      date: {
-        time: "16:20",
-        day: "01/01/2024",
-      },
-    },
-  ];
+type OrderTableProps = {
+  bookings: Booking[];
+};
 
+export default function OrderTable({ bookings }: OrderTableProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <table className="w-full text-left">
@@ -57,8 +22,8 @@ export default function OrderTable() {
         </thead>
 
         <tbody>
-          {data.map((order, i) => (
-            <OrderRow key={i} order={order} />
+          {bookings.map((order) => (
+            <OrderRow key={order.id} order={order} />
           ))}
         </tbody>
       </table>

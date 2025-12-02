@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./admin.css"
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -49,7 +50,7 @@ export default async function RootLayout({
           </aside>
 
           {/* Content bên phải */}
-          <main className="ml-64 mt-5 p-6 w-full">
+          <main className="ml-64 mt-15 p-6 w-full">
             {children}
           </main>
 

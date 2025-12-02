@@ -1,12 +1,27 @@
-export default function PaymentInfo({ info }: any) {
+type PaymentInfoProps = {
+  info: {
+    total: number;
+    discount: number;
+    final: number;
+    method: string;
+    status: number;
+  };
+};
+
+export default function PaymentInfo({ info }: PaymentInfoProps) {
+  const formatVnd = (value: number) =>
+    `${value.toLocaleString("vi-VN")}₫`;
+
+  const statusText =
+    info.status === 1 ? "Đã thanh toán" : info.status === 0 ? "Chưa thanh toán" : "Không rõ";
+
   return (
     <div className="text-sm">
-      <div>Tổng tiền: {info.total}</div>
-      <div>Giảm: {info.discount}</div>
-      <div>Mã giảm: {info.code}</div>
-      <div>Thanh toán: {info.final}</div>
+      <div>Tổng tiền: {formatVnd(info.total)}</div>
+      <div>Giảm: {formatVnd(info.discount)}</div>
+      <div>Thanh toán: {formatVnd(info.final)}</div>
       <div>PTTT: {info.method}</div>
-      <div>TTTT: {info.status}</div>
+      <div>TTTT: {statusText}</div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ interface UseFilePondOptions {
   acceptedFileTypes?: string[];
   allowMultiple?: boolean;
   imagePreviewHeight?: number;
+  initialFiles?: (File | string)[];
 }
 
 export const useFilePond = (options: UseFilePondOptions = {}) => {
@@ -23,6 +24,7 @@ export const useFilePond = (options: UseFilePondOptions = {}) => {
     acceptedFileTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"],
     allowMultiple = true,
     imagePreviewHeight = 170,
+    initialFiles = [],
   } = options;
 
   useEffect(() => {
@@ -63,12 +65,30 @@ export const useFilePond = (options: UseFilePondOptions = {}) => {
       imagePreviewHeight,
       stylePanelLayout: "compact",
       credits: false,
+
       onupdatefiles: (fileItems) => {
         const files = fileItems.map((x) => x.file);
         optionsRef.current.onFileChange?.(files);
       },
-    });
+      
+    }
+  );
   }
+  if (optionsRef.current.initialFiles?.length) {
+  for (const file of optionsRef.current.initialFiles) {
+  if (typeof file === "string") {
+    // URL case
+    pondRef.current.addFile({
+      source: file,
+      options: { type: "local" }
+    });
+  } else {
+    // File object case
+    pondRef.current.addFile(file);
+  }
+}
+
+}
 };
 
 

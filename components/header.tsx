@@ -5,7 +5,7 @@ import { MdNotifications } from "react-icons/md";
 
 export default function Header() {
   return (
-    <header className="w-full h-16 border-b border-gray-300 bg-white flex items-center justify-between px-6">
+    <header className="w-full h-16 border-b border-gray-300 bg-white flex items-center fixed top-0  justify-between px-6 z-10">
 
       {/* Logo */}
       <div className="text-2xl font-bold flex items-center gap-1">
