@@ -30,7 +30,7 @@ export interface Booking {
   customerNote?: string;
   status: number;
   note?: string;
-  createdAt?: string;
+  created_at?: number[]
 }
 
 export interface BookingListResponse {
@@ -40,13 +40,45 @@ export interface BookingListResponse {
   currentPage: number;
 }
 
-export const getBookings = async (offset = 0, limit = 10) => {
-  const url = `${API_BASE_URL}/bookings?offset=${offset}&limit=${limit}`;
+export const getBookings = async (
+  offset = 0,
+  limit = 10,
+  paymentStatus: number | undefined,
+  name?: string | undefined,
+  dateFrom?: string | undefined,
+  dateTo?: string | undefined
+) => {
+  const params = new URLSearchParams();
+  params.set("offset", String(offset));
+  params.set("limit", String(limit));
+  if (paymentStatus !== undefined) params.set("paymentStatus", String(paymentStatus));
+  if (name) params.set("name", name);
+  if (dateFrom) params.set("dateFrom", dateFrom);
+  if (dateTo) params.set("dateTo", dateTo);
+
+  const url = `${API_BASE_URL}/bookings?${params.toString()}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch bookings");
   }
   const data: BookingListResponse = await res.json();
+  return data;
+};
+
+export const updateBookingPaymentStatus = async (
+  id: number,
+  paymentStatus: number
+) => {
+  const url = `${API_BASE_URL}/bookings/${id}`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paymentStatus }),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to update booking payment status");
+  }
+  const data: Booking = await res.json();
   return data;
 };
 
