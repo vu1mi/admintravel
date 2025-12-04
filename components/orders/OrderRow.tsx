@@ -18,7 +18,7 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
   const [paymentStatusState, setPaymentStatusState] = useState<number>(order.paymentStatus);
 
   const createdAt = order?.created_at
-    ? `${order.created_at[0]}-${order.created_at[1]}-${order.created_at[2]} ${order.created_at[3]}:${order.created_at[4]}:${order.created_at[5]}`
+    ? `${order.created_at[0]}-${order.created_at[1]}-${order.created_at[2]} `
     : null;
 
   useEffect(() => {

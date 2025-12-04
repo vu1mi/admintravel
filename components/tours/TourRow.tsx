@@ -2,7 +2,7 @@ import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 type TourRowProps = {
   name: string;
-  image: string;
+  imageUrl: string;
   price: {
     adult: string;
     child: string;
@@ -21,10 +21,11 @@ type TourRowProps = {
   updatedAt: string;
 };
 
+
 export default function TourRow(props: TourRowProps) {
   const {
     name,
-    image,
+    imageUrl,
     price,
     remain,
     position,
@@ -35,6 +36,8 @@ export default function TourRow(props: TourRowProps) {
     updatedAt,
   } = props;
 
+  console.log(imageUrl)
+   
   return (
     <tr className="border-b">
       <td className="p-3">
@@ -45,7 +48,7 @@ export default function TourRow(props: TourRowProps) {
 
       <td className="p-3">
         <img
-          src={image}
+          src={`/uploads/${imageUrl}`}
           className="w-16 h-16 object-cover rounded-lg"
           alt={name}
         />

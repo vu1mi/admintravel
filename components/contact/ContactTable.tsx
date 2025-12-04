@@ -1,12 +1,11 @@
 import ContactRow from "./ContactRow";
+import {EmailResponse} from '@/app/api/contactApi'
+interface Props{
+  data:EmailResponse
+}
 
-export default function ContactTable() {
-  const data = [
-    {
-      email: "levana@gmail.com",
-      created: "16:40 - 12/12/2024",
-    },
-  ];
+export default function ContactTable({data}:Props) {
+  const datacontact = data?.data
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -21,7 +20,7 @@ export default function ContactTable() {
         </thead>
 
         <tbody>
-          {data.map((item, i) => (
+          {datacontact?.map((item, i) => (
             <ContactRow key={i} {...item} />
           ))}
         </tbody>

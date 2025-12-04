@@ -34,6 +34,21 @@ export default function ToursPage() {
   const [priceRangeFilter, setPriceRangeFilter] = useState("");
 
   const limit = 10;
+  // const API_BASE_URL =
+  // process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
+
+  // ... các state, useEffect, fetchTours giữ nguyên ...
+
+  const getImageUrl = (raw?: string | null) => {
+    if (!raw) return "";
+    // Nếu đã là URL đầy đủ (dùng cho mấy tour seed link từ GG Image)
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      return raw;
+    }
+    // Còn lại coi là filename trong thư mục uploads trên backend
+    return `http://localhost:8088/api/tours/images/${raw}`;
+  };
 
   useEffect(() => {
     fetchTours();
@@ -162,13 +177,13 @@ export default function ToursPage() {
             </select>
           </div>
 
-          <div className="inner-item">
+          {/* <div className="inner-item">
             <select>
               <option value="">Người tạo</option>
               <option value="">Lê Văn A</option>
               <option value="">Lê Văn B</option>
             </select>
-          </div>
+          </div> */}
 
           <div className="inner-item">
             <input type="date" />
@@ -176,7 +191,7 @@ export default function ToursPage() {
             <input type="date" />
           </div>
 
-          <div className="inner-item">
+          {/* <div className="inner-item">
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
@@ -185,7 +200,7 @@ export default function ToursPage() {
               <option value="1">Danh mục 1</option>
               <option value="2">Danh mục 2</option>
             </select>
-          </div>
+          </div> */}
 
           <div className="inner-item">
             <select
@@ -333,7 +348,7 @@ export default function ToursPage() {
                         {tour.imageUrl && (
                           <img
                             className="inner-avatar"
-                            src={tour.imageUrl}
+                            src={getImageUrl(tour?.imageUrl)}
                             alt={tour.name}
                           />
                         )}
