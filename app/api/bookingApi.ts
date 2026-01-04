@@ -1,5 +1,7 @@
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api";
+
 
 export interface BookingItem {
   id: number;
@@ -67,12 +69,16 @@ export const getBookings = async (
 
 export const updateBookingPaymentStatus = async (
   id: number,
-  paymentStatus: number
+  paymentStatus: number,
+  sessionToken: string
 ) => {
+   
   const url = `${API_BASE_URL}/bookings/${id}`;
   const res = await fetch(url, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json",
+      "Authorization": `Bearer ${sessionToken}`
+     },
     body: JSON.stringify({ paymentStatus }),
   });
   if (!res.ok) {

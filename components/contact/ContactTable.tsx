@@ -2,10 +2,12 @@ import ContactRow from "./ContactRow";
 import {EmailResponse} from '@/app/api/contactApi'
 interface Props{
   data:EmailResponse
+  setRerender: (rerender: boolean) => void
 }
 
-export default function ContactTable({data}:Props) {
+export default function ContactTable({data, setRerender}:Props) {
   const datacontact = data?.data
+  console.log("data contact",datacontact)
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -21,7 +23,7 @@ export default function ContactTable({data}:Props) {
 
         <tbody>
           {datacontact?.map((item, i) => (
-            <ContactRow key={i} {...item} />
+            <ContactRow key={i} {...item} setRerender={setRerender} />
           ))}
         </tbody>
       </table>

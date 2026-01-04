@@ -1,6 +1,4 @@
-// src/app/settings/page.tsx
 "use client";
-
 import React from "react";
 import Link from "next/link";
 import { FiInfo, FiUser, FiUsers } from "react-icons/fi";

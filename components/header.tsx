@@ -9,7 +9,7 @@ export default function Header() {
 
       {/* Logo */}
       <div className="text-2xl font-bold flex items-center gap-1">
-        <span className="text-blue-600">28</span>
+        <span className="text-blue-600">TRAVEL</span>
         <span>Admin</span>
       </div>
 
@@ -30,13 +30,7 @@ export default function Header() {
 
         {/* User */}
         <div className="flex items-center gap-3 cursor-pointer">
-          <Image
-            src="/avatar.png"
-            width={40}
-            height={40}
-            alt="Avatar"
-            className="rounded-full object-cover"
-          />
+   
           <div>
             <div className="font-semibold">Le Van A</div>
             <div className="text-gray-500 text-sm -mt-1">Admin</div>

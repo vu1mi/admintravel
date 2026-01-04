@@ -81,7 +81,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
         alert(
           "Không thể tải dữ liệu tour. Vui lòng thử lại sau!\n" +
             (error.response?.data?.message || error.message)
-        );
+);
       } finally {
         setLoading(false);
       }
@@ -95,7 +95,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
    * Parse duration từ string sang số ngày
    * VD: "3 ngày 2 đêm" -> 3
    */
-  console.log(tourData?.images)
+  console.log(tourData?.images);
   const parseDuration = (timeStr: string): number => {
     const match = timeStr.match(/(\d+)\s*ngày/i);
     return match ? parseInt(match[1]) : 1;
@@ -184,8 +184,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
       // ===== Prepare TourAdminRequest =====
       const timeStr = (formData.get("time") as string) || "1 ngày";
       const departureDateStr = formData.get("departureDate") as string;
-
-      const tourRequest: TourAdminRequest = {
+const tourRequest: TourAdminRequest = {
         name: name.trim(),
         tourTypeId: parseInt(tourTypeId),
         priceAdult: parseFloat(formData.get("priceAdult") as string) || 0,
@@ -227,7 +226,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
 
       // Redirect to tours list
       setTimeout(() => {
-        window.location.href = "/admin/tours";
+        window.location.href = "/home/tours";
       }, 1000);
     } catch (error: any) {
       console.error("❌ Error updating tour:", error);
@@ -284,8 +283,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
       </div>
     );
   }
-
-  // ==================== Render Form ====================
+// ==================== Render Form ====================
   return (
     <div className="section-8">
       <form id="tour-edit-form" onSubmit={handleSubmit}>
@@ -376,7 +374,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
               <input
                 type="number"
                 name="priceBaby"
-                id="priceBaby"
+id="priceBaby"
                 defaultValue={tourData.priceInfant || 0}
                 min="0"
               />
@@ -469,7 +467,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
 
         <div className="inner-group">
           <label className="inner-label" htmlFor="departureDate">
-            Ngày khởi hành
+Ngày khởi hành
           </label>
           <input
             type="date"
@@ -511,7 +509,7 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
       </form>
 
       <div className="inner-back">
-        <a href="/admin/tours">Quay lại danh sách</a>
+        <a href="/home/tours">Quay lại danh sách</a>
       </div>
     </div>
   );

@@ -3,14 +3,14 @@ const API_BASE_URL =
 
 export type DateTuple = [number, number, number, number, number, number];
 
-export interface EmailItem {
-  createdBy: string;
-  updatedBy: string;
-  id: number;
-  email: string;
-  created_at: DateTuple;
-  updated_at: DateTuple;
-}
+// export interface EmailItem {
+//   createdBy: string;
+//   updatedBy: string;
+//   id: number;
+//   email: string;
+//   created_at: DateTuple;
+//   updated_at: DateTuple;
+// }
 
 export interface EmailResponse {
   data: EmailItem[];
@@ -30,3 +30,29 @@ export const getContact = async (): Promise<EmailResponse> => {
   const data: EmailResponse = await res.json();
   return data;
 };
+
+//  xoa contact 
+export const deleteContact = async (id: number): Promise<void> => {
+  const res = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to delete contact!");
+  } 
+};
+
+//  them contact
+export const addContact = async (email: string): Promise<any> => {
+  const res = await fetch(`${API_BASE_URL}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to add contact!");
+  }
+  const data:any = await res.json();
+  return data;
+}

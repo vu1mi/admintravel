@@ -399,7 +399,7 @@ export default function CreateTourForm() {
       </form>
 
       <div className="inner-back">
-        <a href="/admin/tours">Quay lại danh sách</a>
+        <a href="/home/tours">Quay lại danh sách</a>
       </div>
     </div>
   );

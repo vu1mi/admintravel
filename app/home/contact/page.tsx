@@ -1,4 +1,4 @@
-import ContactClient from "@/app/contact/contactclient";
+import ContactClient from "@/app/home/contact/contactclient";
 
 export default function ContactPage() {
   return (

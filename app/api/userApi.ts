@@ -44,6 +44,7 @@ export const updateUser = async (id: number, payload: UpdateUserPayload) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      
     },
     body: JSON.stringify(payload),
   });

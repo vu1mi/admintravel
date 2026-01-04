@@ -21,12 +21,13 @@ export default function UserAction({
 }: UserActionProps) {
   const [selectedAction, setSelectedAction] = useState<string>("");
   const [isApplying, setIsApplying] = useState(false);
-
+  console.log('ids',ids)
   const handleApply = async () => {
     if (!selectedAction || !ids.length) {
       return;
     }
 
+    
     setIsApplying(true);
     try {
       if (selectedAction === "delete") {

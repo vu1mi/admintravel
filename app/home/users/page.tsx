@@ -1,4 +1,4 @@
-import UsersPageClient from "@/app/users/userclient";
+import UsersPageClient from "@/app/home/users/userclient";
 
 export default function UsersPage() {
   return (

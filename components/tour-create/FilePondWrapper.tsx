@@ -2,6 +2,9 @@
 
 import { useFilePond } from "@/hooks/useFilePond";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api";
+
 export default function FilePondWrapper({ initialFiles = [], onChange }: any) {
   
   const getMimeFromFilename = (file: string) => {
@@ -12,12 +15,21 @@ export default function FilePondWrapper({ initialFiles = [], onChange }: any) {
     return "image/*";
   };
 
+  const getImageUrl = (fileName: string) => {
+    // If it's already a full URL, return as is
+    if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
+      return fileName;
+    }
+    // Otherwise, use the API endpoint
+    return `${API_BASE_URL}/tours/images/${fileName}`;
+  };
+
   const formattedInitialFiles = initialFiles.map((fileName: string) => ({
-    source: `/uploads/${fileName}`,
+    source: getImageUrl(fileName),
     options: {
       type: "local",
       metadata: {
-        mimeType: getMimeFromFilename(fileName), // ⭐ CHỈ ĐƯỢC ĐỂ TRONG metadata
+        mimeType: getMimeFromFilename(fileName),
       }
     }
   }));

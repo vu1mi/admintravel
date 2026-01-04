@@ -5,6 +5,7 @@ import OrderStatusBadge from "./OrderStatusBadge";
 import type { Booking } from "@/app/api/bookingApi";
 import { getUserById, type UserDetail } from "@/app/api/userApi";
 import { updateBookingPaymentStatus } from "@/app/api/bookingApi";
+import { useAppContext } from "@/app/AppProvider";
 
 type OrderRowProps = {
   order: Booking;
@@ -16,6 +17,7 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
   const [loadingUser, setLoadingUser] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [paymentStatusState, setPaymentStatusState] = useState<number>(order.paymentStatus);
+  const {sessionToken} = useAppContext();
 
   const createdAt = order?.created_at
     ? `${order.created_at[0]}-${order.created_at[1]}-${order.created_at[2]} `
@@ -59,7 +61,7 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
   // ✅ Function để cập nhật trạng thái và refetch
   const handleUpdateStatus = async (newStatus: number) => {
     try {
-      await updateBookingPaymentStatus(order.id, newStatus);
+      await updateBookingPaymentStatus(order.id, newStatus, sessionToken);
       setPaymentStatusState(newStatus);
       setShowModal(false);
       

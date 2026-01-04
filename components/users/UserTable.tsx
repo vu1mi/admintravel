@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import UserRow from "./UserRow";
-import { DataUsers, User } from "@/app/users/userclient";
+import { DataUsers, User } from "@/app/home/users/userclient";
 
 interface Propsuser{
   data: DataUsers | undefined;

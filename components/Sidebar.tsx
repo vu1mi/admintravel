@@ -12,7 +12,16 @@ import {
   MdSettings,
   MdManageAccounts,
   MdPowerSettingsNew,
+ 
 } from "react-icons/md";
+import { TicketSlash,UsersRound  } from 'lucide-react';
+
+const logout = () => {
+  // Xoá token khỏi localStorage hoặc cookie
+  localStorage.removeItem("sessionToken");
+  // Chuyển hướng về trang đăng nhập
+  window.location.href = "/";
+}
 
 const Sidebar: React.FC = () => {
   return (
@@ -23,23 +32,25 @@ const Sidebar: React.FC = () => {
       {/* Menu chính */}
       <ul className="flex flex-col gap-1">
         <SidebarItem to="/" icon={<MdDashboard size={20} />} label="Tổng quan" />
-        <SidebarItem to="/category" icon={<MdCategory size={20} />} label="Quản lý danh mục" />
-        <SidebarItem to="/tours" icon={<MdTour size={20} />} label="Quản lý tour" />
-        <SidebarItem to="/order" icon={<MdListAlt size={20} />} label="Quản lý đơn hàng" />
-        <SidebarItem to="/users" icon={<MdPeople size={20} />} label="Quản lý người dùng" />
-        <SidebarItem to="/contact" icon={<MdMail size={20} />} label="Thông tin liên hệ" />
+        <SidebarItem to="/home/category" icon={<MdCategory size={20} />} label="Quản lý danh mục" />
+        <SidebarItem to="/home/tours" icon={<MdTour size={20} />} label="Quản lý tour" />
+        <SidebarItem to="/home/order" icon={<MdListAlt size={20} />} label="Quản lý đơn hàng" />
+        <SidebarItem to="/home/users" icon={<MdPeople size={20} />} label="Quản lý người dùng" />
+        <SidebarItem to="/home/contact" icon={<MdMail size={20} />} label="Thông tin liên hệ" />
+        <SidebarItem to="/home/vouchers" icon={<TicketSlash size={20} />} label="Vouchers" />
+        <SidebarItem to="/home/members" icon={<UsersRound size={20} />} label="Nhân viên" />
       </ul>
 
       <hr className="my-4" />
 
       {/* Menu phụ */}
       <ul className="flex flex-col gap-1">
-        <SidebarItem to="/settings" icon={<MdSettings size={20} />} label="Cài đặt chung" />
-        <SidebarItem to="/profile" icon={<MdManageAccounts size={20} />} label="Thông tin cá nhân" />
+        <SidebarItem to="/home/settings" icon={<MdSettings size={20} />} label="Cài đặt chung" />
+        <SidebarItem to="/home/profile" icon={<MdManageAccounts size={20} />} label="Thông tin cá nhân" />
 
         {/* Logout */}
         <li>
-          <button className="flex items-center gap-3 text-red-500 px-3 py-2 rounded-lg hover:bg-red-50 w-full">
+          <button onClick={logout} className="flex items-center gap-3 text-red-500 px-3 py-2 rounded-lg hover:bg-red-50 w-full">
             <MdPowerSettingsNew size={20} />
             <span>Đăng xuất</span>
           </button>

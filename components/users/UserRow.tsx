@@ -1,6 +1,6 @@
 "use client";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
-import { User } from "@/app/users/userclient";
+import { User } from "@/app/home/users/userclient";
 import { deleteUsers } from "@/app/api/userApi";
 
 type UserRowProps = {
