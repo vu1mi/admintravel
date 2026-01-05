@@ -197,7 +197,7 @@ const dashboardData = data
         <h1 className="text-4xl font-bold text-gray-800 text-center mb-2">
         Doanh Thu Theo Tháng 2025
         </h1>
-        <p className="text-center text-gray-600 mb-8 text-sm">
+        <p className="text-3xl font-bold mb-12 text-center ">
           Tổng quan hoạt động kinh doanh
         </p>
 

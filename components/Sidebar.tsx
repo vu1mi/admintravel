@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
 
       {/* Menu chính */}
       <ul className="flex flex-col gap-1">
-        <SidebarItem to="/" icon={<MdDashboard size={20} />} label="Tổng quan" />
+        <SidebarItem to="/home" icon={<MdDashboard size={20} />} label="Tổng quan" />
         <SidebarItem to="/home/category" icon={<MdCategory size={20} />} label="Quản lý danh mục" />
         <SidebarItem to="/home/tours" icon={<MdTour size={20} />} label="Quản lý tour" />
         <SidebarItem to="/home/order" icon={<MdListAlt size={20} />} label="Quản lý đơn hàng" />

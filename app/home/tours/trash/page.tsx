@@ -6,6 +6,8 @@ import {
   restoreTour,
   permanentDeleteTour,
   type TourResponse,
+   TourAdminRequest,
+
 } from "@/app/api/tourApi";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -70,11 +72,11 @@ export default function ToursTrashPage() {
     }
   };
 
-  const handleRestore = async (id: number) => {
+  const handleRestore = async (tourId: number, data: TourAdminRequest) => {
     if (!confirm("Bạn có chắc chắn muốn khôi phục tour này?")) return;
-
+    console.log("Restoring tour with data:", data , tourId);
     try {
-      await restoreTour(id);
+      await restoreTour(tourId, data);
       toast.success("Khôi phục tour thành công");
       fetchTours();
     } catch (error) {
@@ -101,7 +103,7 @@ export default function ToursTrashPage() {
     }
   };
 
-  const handleBulkAction = async (action: string) => {
+  const handleBulkAction = async (action: string, data: TourAdminRequest) => {
     if (selectedIds.length === 0) {
       toast.error("Vui lòng chọn ít nhất một tour");
       return;
@@ -113,7 +115,7 @@ export default function ToursTrashPage() {
           confirm(`Bạn có chắc chắn muốn khôi phục ${selectedIds.length} tour?`)
         ) {
           try {
-            await Promise.all(selectedIds.map((id) => restoreTour(id)));
+            await Promise.all(selectedIds.map((id) => restoreTour(id,data)));
             toast.success("Đã khôi phục các tour đã chọn");
             fetchTours();
             setSelectedIds([]);
@@ -242,7 +244,16 @@ export default function ToursTrashPage() {
                     </td>
                   </tr>
                 ) : (
-                  tours.map((tour) => (
+                  tours.map((tour) => { 
+                     const data: TourAdminRequest = {
+                      ...tour,
+                      status: 1, // set status to active
+                    }
+                    // const id = parseInt(tour.id)
+                    const id = tour.id
+                    console.log("Tour ID:", id, typeof id);
+                    return (
+                   
                     <tr key={tour.id}>
                       <td className="text-left">
                         <div className="checkbox-wrapper-30">
@@ -303,7 +314,7 @@ export default function ToursTrashPage() {
                         <div className="box-actions">
                           <button
                             className="inner-edit"
-                            onClick={() => handleRestore(tour.id)}
+                            onClick={() => handleRestore(id, data)}
                             style={{
                               border: "none",
                               background: "none",
@@ -328,11 +339,13 @@ export default function ToursTrashPage() {
                         </div>
                       </td>
                     </tr>
-                  ))
+                  )})
                 )}
               </tbody>
             </table>
           )}
+        
+        
         </div>
       </div>
 

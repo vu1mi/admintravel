@@ -121,7 +121,6 @@ export default function EditTourForm({ tourId }: EditTourFormProps) {
       "0"
     )}`;
   };
-
   /**
    * Lấy locationIds từ checkboxes
    */
@@ -205,7 +204,7 @@ const tourRequest: TourAdminRequest = {
         })),
       };
 
-      console.log("📤 Sending update tour request:", tourRequest);
+
 
       // ===== Step 1: Update Tour =====
       await updateTour(tourId, tourRequest);

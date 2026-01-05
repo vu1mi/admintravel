@@ -293,9 +293,9 @@ export const deleteTour = async (id: number) => {
 /**
  * Khôi phục tour từ thùng rác (Admin) - Restore (status = 1)
  */
-export const restoreTour = async (id: number) => {
-  console.log("🚀 Calling restoreTour API:", id);
-  return api.patch<string>(`/tours/${id}/restore`);
+export const restoreTour = async (id: number, data: TourAdminRequest) => {
+   console.log("🚀 Calling updateTour API:", id, data);
+  return api.put<string>(`/tours/${id}`, data);
 };
 
 /**
