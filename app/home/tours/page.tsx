@@ -32,13 +32,10 @@ export default function ToursPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [priceRangeFilter, setPriceRangeFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const limit = 10;
-  // const API_BASE_URL =
-  // process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-
-
-  // ... các state, useEffect, fetchTours giữ nguyên ...
 
   const getImageUrl = (raw?: string | null) => {
     if (!raw) return "";
@@ -52,7 +49,7 @@ export default function ToursPage() {
 
   useEffect(() => {
     fetchTours();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, statusFilter, priceRangeFilter, startDate, endDate]);
 
   const fetchTours = async () => {
     try {
@@ -72,6 +69,9 @@ export default function ToursPage() {
         priceFrom = 6000000;
       }
 
+      // Convert status filter to number
+      const statusValue = statusFilter === "active" ? 1 : statusFilter === "inactive" ? 0 : undefined;
+
       const response = await getTours(
         offset,
         limit,
@@ -79,8 +79,8 @@ export default function ToursPage() {
         searchTerm,
         priceFrom,
         priceTo,
-        undefined,
-        1 // status = 1 (active tours only)
+        startDate || undefined,
+        statusValue
       );
 
       setTours(response.data.tours);
@@ -152,6 +152,8 @@ export default function ToursPage() {
     setCategoryFilter("");
     setPriceRangeFilter("");
     setSearchTerm("");
+    setStartDate("");
+    setEndDate("");
     setCurrentPage(1);
   };
 
@@ -186,9 +188,17 @@ export default function ToursPage() {
           </div> */}
 
           <div className="inner-item">
-            <input type="date" />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
             <span>-</span>
-            <input type="date" />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
 
           {/* <div className="inner-item">

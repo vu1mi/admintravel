@@ -51,12 +51,21 @@ export default function LoginForm() {
         },
         method: "POST",
       }).then(async (res) => {
-        const payload = await res.json();
-        console.log("Login Response:", payload);
         if (!res.ok) {
-          throw data;
+          let errorMessage = "Đăng nhập thất bại";
+          try {
+            const errorData = await res.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            const textError = await res.text();
+            console.error("Server error:", textError);
+            errorMessage = "Lỗi server, vui lòng kiểm tra lại thông tin đăng nhập";
+          }
+          throw new Error(errorMessage);
         }
 
+        const payload = await res.json();
+        console.log("Login Response:", payload);
         return payload;
       });
       console.log(result);
@@ -68,11 +77,11 @@ export default function LoginForm() {
           "Content-Type": "application/json",
         },
       }).then(async (res) => {
-        const payload = await res.json();
-
         if (!res.ok) {
-          throw data;
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Lỗi xác thực");
         }
+        const payload = await res.json();
         console.log("payloadNextServer", payload);
         return payload;
       });
@@ -80,8 +89,8 @@ export default function LoginForm() {
       router.push("/home");
       router.refresh();
     } catch (error: any) {
-      console.log(error);
-      toast.error("Mật khẩu hoặc email chưa đúng");
+      console.error("Login error:", error);
+      toast.error(error.message || "Mật khẩu hoặc email chưa đúng");
     }
   }
   return (

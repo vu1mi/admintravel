@@ -33,17 +33,17 @@ const SettingsPage: React.FC = () => {
         <SettingsCard
           icon={<FiInfo size={30} />}
           title="Thông tin website"
-          href="/settings/website"
+          href="/home/settings/website"
         />
         <SettingsCard
           icon={<FiUser size={30} />}
           title="Tài khoản quản trị"
-          href="/settings/admin-accounts"
+          href="/home/settings/admins"
         />
         <SettingsCard
           icon={<FiUsers size={30} />}
           title="Nhóm quyền"
-          href="/settings/roles"
+          href="/home/settings/roles"
         />
       </div>
     </div>
