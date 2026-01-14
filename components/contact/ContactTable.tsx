@@ -1,8 +1,9 @@
 import ContactRow from "./ContactRow";
-import {EmailResponse} from '@/app/api/contactApi'
-interface Props{
-  data:EmailResponse
-  setRerender: (rerender: boolean) => void
+import { ContactListResponse } from "@/app/api/contactApi";
+
+interface Props {
+  data: ContactListResponse | null;
+  setRerender: (rerender: boolean) => void;
 }
 
 export default function ContactTable({data, setRerender}:Props) {

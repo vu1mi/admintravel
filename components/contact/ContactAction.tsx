@@ -1,17 +1,26 @@
 "use client";
 
 import { addContact } from "@/app/api/contactApi";
-import { useState } from "react";
-interface Props{
-  reRender: (rerender: boolean) => void
+import { useState, useEffect } from "react";
+
+interface Props {
+  reRender: (rerender: boolean) => void;
+  onSearch?: (keyword: string) => void;
 }
-export default function ContactAction({reRender}:Props) {
+
+export default function ContactAction({ reRender, onSearch }: Props) {
   const [showform, setShowform] = useState(false);
-   const [email, setEmail] = useState("");
-  const [result, setResult] = useState<{
-    email: string;
-    createdAt: string;
-  } | null>(null);
+  const [email, setEmail] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // Debounce search - trigger after 300ms of no typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearch?.(searchKeyword);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword, onSearch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +53,9 @@ export default function ContactAction({reRender}:Props) {
           <input
             type="text"
             className="flex-1 outline-none"
-            placeholder="Tìm kiếm"
+            placeholder="Tìm kiếm theo email"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
       </div>
     </div>

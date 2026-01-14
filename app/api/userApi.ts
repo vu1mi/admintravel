@@ -15,6 +15,22 @@ export interface UserDetail {
   roleCode?: string;
 }
 
+export interface UserListResponse {
+  users: UserDetail[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+  pageSize: number;
+}
+
+export interface CreateUserPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  roleCode: string;
+}
+
 export interface ChangePasswordPayload {
   oldPassword: string;
   newPassword: string;
@@ -27,6 +43,7 @@ export type UpdateUserPayload = {
   phone?: string;
   address?: string;
   avatar?: string;
+  roleCode: string;
   status?: number;
 };
 
@@ -52,7 +69,6 @@ export const updateUser = async (id: number, payload: UpdateUserPayload) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      
     },
     body: JSON.stringify(payload),
   });
@@ -108,4 +124,43 @@ export const changePassword = async (
   return res.text();
 };
 
+export const getUsersByRoleCode = async (
+  roleCode: string,
+  keyword?: string,
+  offset: number = 0,
+  limit: number = 10
+): Promise<UserListResponse> => {
+  const params = new URLSearchParams();
+  if (keyword) params.append("keyword", keyword);
+  params.append("offset", offset.toString());
+  params.append("limit", limit.toString());
 
+  const res = await fetch(
+    `${USERS_ENDPOINT}/role/${roleCode}?${params.toString()}`
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to get users by role code");
+  }
+
+  return res.json();
+};
+
+export const createUser = async (
+  payload: CreateUserPayload
+): Promise<UserDetail> => {
+  const res = await fetch(USERS_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const message = await res.text();
+    throw new Error(message || "Create user failed");
+  }
+
+  return res.json();
+};

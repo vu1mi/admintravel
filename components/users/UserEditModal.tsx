@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User } from "@/app/users/userclient";
 import { updateUser, UpdateUserPayload } from "@/app/api/userApi";
+import { User } from "@/app/home/users/userclient";
 
 type UserEditModalProps = {
   user: User | null;
@@ -15,6 +15,7 @@ const DEFAULT_FORM: UpdateUserPayload = {
   email: "",
   phone: "",
   address: "",
+  roleCode: "USER",
   status: 1,
 };
 
@@ -35,6 +36,7 @@ export default function UserEditModal({
         phone: user.phone,
         address: user.address,
         avatar: user.avatar,
+        roleCode: "USER",
         status: user.status,
       });
       setError(null);
@@ -122,7 +124,9 @@ export default function UserEditModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+            <label className="block text-sm font-medium mb-1">
+              Số điện thoại
+            </label>
             <input
               name="phone"
               value={formData.phone || ""}
@@ -174,4 +178,3 @@ export default function UserEditModal({
     </div>
   );
 }
-
