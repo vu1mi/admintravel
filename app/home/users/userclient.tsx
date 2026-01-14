@@ -38,15 +38,31 @@ export default function UsersPageClient() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [keyword, setKeyword] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const limit = 10;
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [keyword, statusFilter]);
 
   useEffect(() => {
     const fetchuser = async () => {
       try {
+        setLoading(true);
         const baseUrl = "http://localhost:8088/api";
         const trimmedKeyword = keyword.trim();
+
+        // Backend uses PageRequest.of(offset, limit) which expects page number (0-indexed)
+        // So we send currentPage - 1 as the offset parameter
+        const offset = currentPage - 1;
+
         const params = new URLSearchParams({
-          offset: "0",
-          limit: "10",
+          offset: String(offset),
+          limit: String(limit),
         });
         if (trimmedKeyword) {
           params.set("keyword", trimmedKeyword);
@@ -60,11 +76,13 @@ export default function UsersPageClient() {
         setDataUser(data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchuser();
-  }, [reloadKey, keyword, statusFilter]);
+  }, [reloadKey, keyword, statusFilter, currentPage]);
 
   const refreshUsers = () => setReloadKey((prev) => prev + 1);
   return (
@@ -85,6 +103,10 @@ export default function UsersPageClient() {
         setIds={setIds}
         refreshUsers={refreshUsers}
         onEdit={(user) => setEditingUser(user)}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        loading={loading}
+        limit={limit}
       />
       <UserEditModal
         user={editingUser}

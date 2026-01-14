@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import {
   getTours,
@@ -47,14 +46,28 @@ export default function ToursPage() {
     return `http://localhost:8088/api/tours/images/${raw}`;
   };
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [searchTerm, statusFilter, priceRangeFilter, startDate, endDate]);
+
   useEffect(() => {
     fetchTours();
-  }, [currentPage, searchTerm, statusFilter, priceRangeFilter, startDate, endDate]);
+  }, [
+    currentPage,
+    searchTerm,
+    statusFilter,
+    priceRangeFilter,
+    startDate,
+    endDate,
+  ]);
 
   const fetchTours = async () => {
     try {
       setLoading(true);
-      const offset = (currentPage - 1) * limit;
+      const offset = currentPage - 1;
 
       let priceFrom, priceTo;
       if (priceRangeFilter === "under2m") {
@@ -70,7 +83,12 @@ export default function ToursPage() {
       }
 
       // Convert status filter to number
-      const statusValue = statusFilter === "active" ? 1 : statusFilter === "inactive" ? 0 : undefined;
+      const statusValue =
+        statusFilter === "active"
+          ? 1
+          : statusFilter === "inactive"
+          ? 0
+          : undefined;
 
       const response = await getTours(
         offset,
@@ -423,20 +441,37 @@ export default function ToursPage() {
       {/* Pagination Section */}
       <div className="section-7">
         <span className="inner-label">
-          Hiển thị {Math.min((currentPage - 1) * limit + 1, totalItems)} -{" "}
-          {Math.min(currentPage * limit, totalItems)} của {totalItems}
+          {loading
+            ? "Đang tải..."
+            : totalItems === 0
+            ? "Không có kết quả"
+            : `Hiển thị ${Math.min(
+                (currentPage - 1) * limit + 1,
+                totalItems
+              )} - ${Math.min(
+                currentPage * limit,
+                totalItems
+              )} của ${totalItems}`}
         </span>
-        <select
-          className="inner-pagination"
-          value={currentPage}
-          onChange={(e) => setCurrentPage(Number(e.target.value))}
-        >
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <option key={page} value={page}>
-              Trang {page}
-            </option>
-          ))}
-        </select>
+
+        {totalPages > 0 && (
+          <select
+            className="inner-pagination"
+            value={currentPage}
+            onChange={(e) => setCurrentPage(Number(e.target.value))}
+            disabled={loading || totalPages === 0}
+            aria-label="Chọn trang"
+          >
+            {Array.from(
+              { length: Math.max(1, totalPages) },
+              (_, i) => i + 1
+            ).map((page) => (
+              <option key={page} value={page}>
+                Trang {page}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     </>
   );

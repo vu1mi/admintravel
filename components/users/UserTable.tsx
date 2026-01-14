@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import UserRow from "./UserRow";
 import { DataUsers, User } from "@/app/home/users/userclient";
 
@@ -9,21 +8,25 @@ interface Propsuser{
   setIds: React.Dispatch<React.SetStateAction<number[]>>;
   refreshUsers: () => void;
   onEdit: (user: User) => void;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  loading: boolean;
+  limit: number;
 }
 
-export default function UserTable({ data, ids, setIds, refreshUsers, onEdit }: Propsuser) {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    const limit = 10;
-
-    useEffect(() => {
-      if (data) {
-        setTotalItems(data.totalItems);
-        setTotalPages(data.totalPAges);
-        setCurrentPage(data.currentPage);
-      }
-    }, [data]);
+export default function UserTable({
+  data,
+  ids,
+  setIds,
+  refreshUsers,
+  onEdit,
+  currentPage,
+  setCurrentPage,
+  loading,
+  limit
+}: Propsuser) {
+    const totalPages = data?.totalPAges ?? 0;
+    const totalItems = data?.totalItems ?? 0;
 
     const allVisibleIds = data?.users.map((u) => u.id) ?? [];
     const isAllChecked =
@@ -85,20 +88,34 @@ export default function UserTable({ data, ids, setIds, refreshUsers, onEdit }: P
     </div>
        <div className="section-7 mt-5">
         <span className="inner-label">
-          Hiển thị {Math.min((currentPage - 1) * limit + 1, totalItems)} -{" "}
-          {Math.min(currentPage * limit, totalItems)} của {totalItems}
+          {loading
+            ? "Đang tải..."
+            : totalItems === 0
+            ? "Không có kết quả"
+            : `Hiển thị ${Math.min(
+                (currentPage - 1) * limit + 1,
+                totalItems
+              )} - ${Math.min(currentPage * limit, totalItems)} của ${totalItems} người dùng`}
         </span>
-        <select
-          className="inner-pagination"
-          value={currentPage}
-          onChange={(e) => setCurrentPage(Number(e.target.value))}
-        >
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <option key={page} value={page}>
-              Trang {page}
-            </option>
-          ))}
-        </select>
+
+        {totalPages > 0 && (
+          <select
+            className="inner-pagination"
+            value={currentPage}
+            onChange={(e) => setCurrentPage(Number(e.target.value))}
+            disabled={loading || totalPages === 0}
+            aria-label="Chọn trang người dùng"
+          >
+            {Array.from(
+              { length: Math.max(1, totalPages) },
+              (_, i) => i + 1
+            ).map((page) => (
+              <option key={page} value={page}>
+                Trang {page}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       </>
   );

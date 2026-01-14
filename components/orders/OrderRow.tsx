@@ -16,8 +16,10 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
   const [user, setUser] = useState<UserDetail | null>(null);
   const [loadingUser, setLoadingUser] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [paymentStatusState, setPaymentStatusState] = useState<number>(order.paymentStatus);
-  const {sessionToken} = useAppContext();
+  const [paymentStatusState, setPaymentStatusState] = useState<number>(
+    order.paymentStatus
+  );
+  const { sessionToken } = useAppContext();
 
   const createdAt = order?.created_at
     ? `${order.created_at[0]}-${order.created_at[1]}-${order.created_at[2]} `
@@ -64,7 +66,7 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
       await updateBookingPaymentStatus(order.id, newStatus, sessionToken);
       setPaymentStatusState(newStatus);
       setShowModal(false);
-      
+
       // ✅ Gọi refetch sau khi cập nhật thành công
       if (onRefresh) {
         onRefresh();
@@ -77,7 +79,9 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
 
   return (
     <tr className="border-b hover:border-b-4 hover:border-b-blue-300 hover:bg-blue-100">
-      <td className="p-3 text-blue-600 font-semibold">BK{order.id.toString().padStart(6, "0")}</td>
+      <td className="p-3 text-blue-600 font-semibold">
+        BK{order.id.toString().padStart(6, "0")}
+      </td>
 
       <td className="p-3">
         Họ tên: {customer.name}
@@ -86,7 +90,9 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
         <br />
         Ghi chú: {customer.note}
         {loadingUser && (
-          <div className="text-xs text-gray-400 mt-1">Đang tải thông tin user...</div>
+          <div className="text-xs text-gray-400 mt-1">
+            Đang tải thông tin user...
+          </div>
         )}
       </td>
 
@@ -99,31 +105,32 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
       </td>
 
       <td className="p-3">
-        <OrderStatusBadge status={paymentStatusState} />
+        <OrderStatusBadge status={order.status} />
       </td>
 
-      <td className="p-3 text-blue-600 font-semibold">
-        {createdAt}     
-      </td>
+      <td className="p-3 text-blue-600 font-semibold">{createdAt}</td>
 
       <td className="p-3 relative">
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-500 text-white px-2 py-2 rounded-md hover:bg-blue-700"
         >
-          Sửa đổi 
+          Sửa đổi
         </button>
-        
+
         {showModal && (
           <div className="fixed inset-0 bg-black/40 z-40">
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                            w-[280px] bg-white rounded-xl shadow-xl z-50">
-              
+            <div
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                            w-[280px] bg-white rounded-xl shadow-xl z-50"
+            >
               {/* Header */}
               <div className="flex justify-between items-center px-4 py-3">
-                <h3 className="font-semibold text-gray-700">Trạng thái đơn hàng</h3>
-                <button 
-                  onClick={() => setShowModal(false)} 
+                <h3 className="font-semibold text-gray-700">
+                  Trạng thái thanh toán đơn hàng
+                </h3>
+                <button
+                  onClick={() => setShowModal(false)}
                   className="text-gray-400 hover:text-red-500"
                 >
                   ✕
@@ -146,6 +153,14 @@ export default function OrderRow({ order, onRefresh }: OrderRowProps) {
                              hover:bg-yellow-300 transition"
                 >
                   Chưa thanh toán
+                </button>
+
+                <button
+                  onClick={() => handleUpdateStatus(2)}
+                  className="py-2 rounded-md bg-red-200 text-red-600
+                            hover:bg-red-300 transition"
+                >
+                  Hủy/Hoàn tiền
                 </button>
               </div>
             </div>

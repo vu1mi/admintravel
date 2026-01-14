@@ -1,5 +1,4 @@
 "use client";
-import OrderSearch from "@/components/orders/OrderSearch";
 import OrderTable from "@/components/orders/OrderTable";
 import { useEffect, useState } from "react";
 import { getBookings, type BookingListResponse } from "@/app/api/bookingApi";
@@ -13,9 +12,10 @@ export default function OrdersPage() {
   const [data, setData] = useState<BookingListResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Filter states
   const [statusPayment, setStatusPayment] = useState<number | undefined>();
+  const [bookingStatus, setBookingStatus] = useState<number | undefined>();
   const [dateFrom, setDateFrom] = useState<string | undefined>();
   const [dateTo, setDateTo] = useState<string | undefined>();
   const [searchName, setSearchName] = useState<string | undefined>();
@@ -25,7 +25,7 @@ export default function OrdersPage() {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [statusPayment, dateFrom, dateTo, searchName]);
+  }, [statusPayment, bookingStatus, dateFrom, dateTo, searchName]);
 
   // Function để fetch data
   const fetchData = async () => {
@@ -33,21 +33,26 @@ export default function OrdersPage() {
     setError(null);
 
     console.log("=== FETCHING DATA ===");
-    console.log("Offset:", (currentPage - 1) * limit);
+    console.log("Page:", currentPage);
     console.log("Limit:", limit);
     console.log("Payment Status:", statusPayment);
+    console.log("Booking Status:", bookingStatus);
     console.log("Date From:", dateFrom);
     console.log("Date To:", dateTo);
     console.log("Search Name:", searchName);
 
     try {
+      // Backend uses PageRequest.of(offset, limit) which expects page number (0-indexed)
+      // So we send currentPage - 1 as the offset parameter
+      const offset = currentPage - 1;
       const res = await getBookings(
-        (currentPage - 1) * limit, // offset = (page - 1) * limit
+        offset,
         limit,
         statusPayment,
         searchName,
         dateFrom,
-        dateTo
+        dateTo,
+        bookingStatus
       );
 
       console.log("=== FETCH SUCCESS ===");
@@ -61,9 +66,7 @@ export default function OrdersPage() {
     } catch (err) {
       console.error("=== FETCH ERROR ===", err);
       setError(
-        err instanceof Error
-          ? err.message
-          : "Không thể tải danh sách đơn hàng"
+        err instanceof Error ? err.message : "Không thể tải danh sách đơn hàng"
       );
     } finally {
       setLoading(false);
@@ -74,16 +77,18 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, statusPayment, dateFrom, dateTo, searchName]);
+  }, [currentPage, statusPayment, bookingStatus, dateFrom, dateTo, searchName]);
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Quản lý đơn hàng</h1>
+      <h1 className="text-3xl font-bold mb-6 text-black">Quản lý đơn hàng</h1>
 
       {/* Bộ lọc */}
       <OrderFilter
         status={statusPayment}
         setStatusPayment={setStatusPayment}
+        bookingStatus={bookingStatus}
+        setBookingStatus={setBookingStatus}
         dateFrom={dateFrom}
         dateTo={dateTo}
         setDateFrom={setDateFrom}
@@ -92,15 +97,20 @@ export default function OrdersPage() {
         setSearchName={setSearchName}
       />
 
-      <OrderSearch />
-
       {/* Hiển thị thông tin filter đang áp dụng */}
-      {(statusPayment !== undefined || dateFrom || dateTo || searchName) && (
+      {(statusPayment !== undefined || bookingStatus !== undefined || dateFrom || dateTo || searchName) && (
         <div className="mb-4 p-3 bg-blue-50 rounded-md text-sm">
           <span className="font-semibold">Đang lọc: </span>
           {statusPayment !== undefined && (
             <span className="mr-3">
-              Trạng thái: {statusPayment === 0 ? "Chưa thanh toán" : "Đã thanh toán"}
+              Thanh toán:{" "}
+              {statusPayment === 0 ? "Chưa thanh toán" : statusPayment === 1 ? "Đã thanh toán" : "Đã hủy"}
+            </span>
+          )}
+          {bookingStatus !== undefined && (
+            <span className="mr-3">
+              Đơn hàng:{" "}
+              {bookingStatus === 0 ? "Đã tạo" : bookingStatus === 1 ? "Đã xác nhận" : bookingStatus === 2 ? "Hoàn thành" : "Đã hủy"}
             </span>
           )}
           {dateFrom && <span className="mr-3">Từ: {dateFrom}</span>}
@@ -136,9 +146,12 @@ export default function OrdersPage() {
             : `Hiển thị ${Math.min(
                 (currentPage - 1) * limit + 1,
                 totalItems
-              )} - ${Math.min(currentPage * limit, totalItems)} của ${totalItems} đơn hàng`}
+              )} - ${Math.min(
+                currentPage * limit,
+                totalItems
+              )} của ${totalItems} đơn hàng`}
         </span>
-        
+
         {totalPages > 0 && (
           <select
             className="inner-pagination px-4 py-2 border rounded-md"
@@ -147,13 +160,14 @@ export default function OrdersPage() {
             aria-label="Chọn trang đơn hàng"
             disabled={loading || totalPages === 0}
           >
-            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map(
-              (page) => (
-                <option key={page} value={page}>
-                  Trang {page}
-                </option>
-              )
-            )}
+            {Array.from(
+              { length: Math.max(1, totalPages) },
+              (_, i) => i + 1
+            ).map((page) => (
+              <option key={page} value={page}>
+                Trang {page}
+              </option>
+            ))}
           </select>
         )}
       </div>

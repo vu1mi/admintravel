@@ -1,12 +1,11 @@
-
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api";
-
 
 export interface BookingItem {
   id: number;
   tourId: number;
   tourName: string;
+  tourImage: string;
   departureDate: string;
   adultCount: number;
   childCount: number;
@@ -32,7 +31,7 @@ export interface Booking {
   customerNote?: string;
   status: number;
   note?: string;
-  created_at?: number[]
+  created_at?: number[];
 }
 
 export interface BookingListResponse {
@@ -48,17 +47,20 @@ export const getBookings = async (
   paymentStatus: number | undefined,
   name?: string | undefined,
   dateFrom?: string | undefined,
-  dateTo?: string | undefined
+  dateTo?: string | undefined,
+  bookingStatus?: number | undefined
 ) => {
   const params = new URLSearchParams();
   params.set("offset", String(offset));
   params.set("limit", String(limit));
-  if (paymentStatus !== undefined) params.set("paymentStatus", String(paymentStatus));
-  if (name) params.set("name", name);
-  if (dateFrom) params.set("dateFrom", dateFrom);
-  if (dateTo) params.set("dateTo", dateTo);
+  if (paymentStatus !== undefined)
+    params.set("paymentStatus", String(paymentStatus));
+  if (bookingStatus !== undefined) params.set("status", String(bookingStatus));
+  if (name) params.set("keyword", name);
+  if (dateFrom) params.set("startDate", dateFrom);
+  if (dateTo) params.set("endDate", dateTo);
 
-  const url = `${API_BASE_URL}/bookings?${params.toString()}`;
+  const url = `${API_BASE_URL}/bookings/search?${params.toString()}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch bookings");
@@ -72,13 +74,13 @@ export const updateBookingPaymentStatus = async (
   paymentStatus: number,
   sessionToken: string
 ) => {
-   
   const url = `${API_BASE_URL}/bookings/${id}`;
   const res = await fetch(url, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json",
-      "Authorization": `Bearer ${sessionToken}`
-     },
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
     body: JSON.stringify({ paymentStatus }),
   });
   if (!res.ok) {
@@ -87,5 +89,3 @@ export const updateBookingPaymentStatus = async (
   const data: Booking = await res.json();
   return data;
 };
-
-

@@ -11,6 +11,14 @@ export interface UserDetail {
   address?: string;
   avatar?: string;
   status: number;
+  roleName?: string;
+  roleCode?: string;
+}
+
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export type UpdateUserPayload = {
@@ -64,6 +72,40 @@ export const getUserById = async (id: number): Promise<UserDetail> => {
     throw new Error(message || "Get user failed");
   }
   return res.json();
+};
+
+export const getCurrentUser = async (): Promise<UserDetail> => {
+  // Get userId from cookie
+  const userId = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("userId="))
+    ?.split("=")[1];
+
+  if (!userId) {
+    throw new Error("User not logged in");
+  }
+
+  return getUserById(parseInt(userId));
+};
+
+export const changePassword = async (
+  id: number,
+  payload: ChangePasswordPayload
+): Promise<string> => {
+  const res = await fetch(`${USERS_ENDPOINT}/change-password/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const message = await res.text();
+    throw new Error(message || "Change password failed");
+  }
+
+  return res.text();
 };
 
 
