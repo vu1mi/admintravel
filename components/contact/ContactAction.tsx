@@ -20,7 +20,8 @@ export default function ContactAction({ reRender, onSearch }: Props) {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchKeyword, onSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKeyword]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

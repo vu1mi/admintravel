@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { setupAxiosInterceptors } from "@/app/lib/axios";
 
 const AppContext = createContext({
   sessionToken: "",
@@ -30,6 +31,11 @@ export default function AppProvider({
   const [sessionToken, setSessionToken] = useState(inittialToken || "");
   const [userId, setUserId] = useState(inittialUserId || "");
   const [cart, setCart] = useState({});
+
+  // Setup global axios interceptors once when app loads
+  useEffect(() => {
+    setupAxiosInterceptors();
+  }, []);
 
   return (
     <AppContext.Provider

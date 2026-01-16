@@ -1,6 +1,6 @@
 "use client";
-import { Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import {
   getUsersByRoleCode,
@@ -8,7 +8,7 @@ import {
   deleteUsers,
   UserDetail,
   UserListResponse,
-  CreateUserPayload
+  CreateUserPayload,
 } from "../../api/userApi";
 
 const MemberItem = ({
@@ -16,13 +16,14 @@ const MemberItem = ({
   name,
   email,
   phone,
-  setRerender
+  setRerender,
 }: UserDetail & { setRerender: (fn: (prev: boolean) => boolean) => void }) => {
   const handleDelete = async () => {
     const ok = confirm("Bạn chắc chắn muốn xóa?");
     if (!ok) return;
     try {
       await deleteUsers([id]);
+      alert("Xóa nhân viên thành công");
       setRerender((prev) => !prev);
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -172,7 +173,9 @@ export default function MembersPage() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                   className="w-full border px-3 py-2 rounded"
                   placeholder="Nhập tên nhân viên"
@@ -180,11 +183,15 @@ export default function MembersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Email *</label>
+                <label className="block text-sm font-medium mb-1">
+                  Email *
+                </label>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                   className="w-full border px-3 py-2 rounded"
                   placeholder="Nhập email"
@@ -192,22 +199,30 @@ export default function MembersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+                <label className="block text-sm font-medium mb-1">
+                  Số điện thoại
+                </label>
                 <input
                   type="text"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                   className="w-full border px-3 py-2 rounded"
                   placeholder="Nhập số điện thoại"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Địa chỉ</label>
+                <label className="block text-sm font-medium mb-1">
+                  Địa chỉ
+                </label>
                 <input
                   type="text"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
                   className="w-full border px-3 py-2 rounded"
                   placeholder="Nhập địa chỉ"
                 />

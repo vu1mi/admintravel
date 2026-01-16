@@ -162,7 +162,7 @@ export default function CreateTourForm() {
 
       // Redirect to tours list
       setTimeout(() => {
-        window.location.href = "/admin/tours";
+        window.location.href = "/home/tours";
       }, 1000);
     } catch (error: any) {
       console.error("❌ Error creating tour:", error);

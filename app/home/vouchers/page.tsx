@@ -1,12 +1,19 @@
 "use client";
 import {useEffect, useState} from "react";
-import {getVouchers, addVoucher, VoucherDetail, VoucherRequest} from "../../api/voucherapi";
+import {getVouchers, addVoucher, deleteVoucher, VoucherDetail, VoucherRequest} from "../../api/voucherapi";
 import { FiTrash2 } from "react-icons/fi";
 import checkVoucher from "../../utils/checkvoucher";
 
-const VoucherItem = ({ code ,discountValue ,validTo,discountType, setRerender}: { code: string; discountValue: number; validTo: any; discountType: string; setRerender: (rerender: boolean) => void }) => {
-  const  deletvoucher = async () => {
-    console.log("delete voucher",code)
+const VoucherItem = ({ id, code ,discountValue ,validTo,discountType, setRerender}: { id: number; code: string; discountValue: number; validTo: any; discountType: string; setRerender: React.Dispatch<React.SetStateAction<boolean>> }) => {
+  const handleDeleteVoucher = async () => {
+    if (!confirm(`Bạn có chắc muốn xóa voucher ${code}?`)) return;
+    try {
+      await deleteVoucher(id);
+      setRerender((prev) => !prev);
+    } catch (error) {
+      console.error("Error deleting voucher:", error);
+      alert("Lỗi khi xóa voucher");
+    }
   }
     return (<tr className="border-b">
           <td className="p-3">
@@ -19,9 +26,8 @@ const VoucherItem = ({ code ,discountValue ,validTo,discountType, setRerender}: 
 
           <td className="p-3 flex justify-center">
              <button
-                onClick={deletvoucher}
+                onClick={handleDeleteVoucher}
                 className="w-10 h-10 flex items-center justify-center rounded-lg border border-red-100 text-red-500 hover:bg-red-50"
-                // aria-label={`Xóa ${user?.name}`}
               >
                 <FiTrash2 />
               </button>

@@ -83,12 +83,7 @@ export default function ToursPage() {
       }
 
       // Convert status filter to number
-      const statusValue =
-        statusFilter === "active"
-          ? 1
-          : statusFilter === "inactive"
-          ? 0
-          : undefined;
+      const statusValue = 1;
 
       const response = await getTours(
         offset,

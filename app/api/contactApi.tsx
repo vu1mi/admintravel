@@ -37,13 +37,15 @@ export const getContacts = async (
   if (params?.keyword) searchParams.append("keyword", params.keyword);
   if (params?.start_date) searchParams.append("start_date", params.start_date);
   if (params?.end_date) searchParams.append("end_date", params.end_date);
-  if (params?.offset !== undefined) searchParams.append("offset", params.offset.toString());
-  if (params?.limit !== undefined) searchParams.append("limit", params.limit.toString());
+  if (params?.offset !== undefined)
+    searchParams.append("offset", params.offset.toString());
+  if (params?.limit !== undefined)
+    searchParams.append("limit", params.limit.toString());
 
   const queryString = searchParams.toString();
   const url = queryString ? `${API_BASE_URL}?${queryString}` : API_BASE_URL;
 
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: "include" });
 
   if (!res.ok) {
     throw new Error("Failed to get contacts!");
@@ -54,13 +56,16 @@ export const getContacts = async (
 };
 
 // Delete multiple contacts
-export const deleteContacts = async (ids: number[]): Promise<{ message: string }> => {
+export const deleteContacts = async (
+  ids: number[]
+): Promise<{ message: string }> => {
   if (ids.length === 0) {
     throw new Error("No IDs provided for deletion");
   }
 
   const res = await fetch(`${API_BASE_URL}/${ids.join(",")}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -78,6 +83,7 @@ export const addContact = async (email: string): Promise<ContactItem> => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ email }),
+    credentials: "include",
   });
 
   if (!res.ok) {

@@ -3,7 +3,7 @@ import ContactFilter from "@/components/contact/ContactFilter";
 import ContactAction from "@/components/contact/ContactAction";
 import ContactTable from "@/components/contact/ContactTable";
 import ContactPagination from "@/components/contact/ContactPagination";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getContacts, ContactListResponse, ContactFilterParams } from "@/app/api/contactApi";
 
 export default function ContactClient() {
@@ -28,19 +28,23 @@ export default function ContactClient() {
     fetchData();
   }, [rerender, filters]);
 
-  const handleFilterChange = (newFilters: Partial<ContactFilterParams>) => {
+  const handleFilterChange = useCallback((newFilters: Partial<ContactFilterParams>) => {
     setFilters((prev) => ({ ...prev, ...newFilters, offset: 0 }));
-  };
+  }, []);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setFilters((prev) => ({ ...prev, offset: page * (prev.limit || 10) }));
-  };
+  }, []);
+
+  const handleSearch = useCallback((keyword: string) => {
+    setFilters((prev) => ({ ...prev, keyword, offset: 0 }));
+  }, []);
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Thông tin liên hệ</h1>
       <ContactFilter onFilterChange={handleFilterChange} />
-      <ContactAction reRender={setRerender} onSearch={(keyword) => handleFilterChange({ keyword })} />
+      <ContactAction reRender={setRerender} onSearch={handleSearch} />
       <ContactTable data={datacontact} setRerender={setRerender} />
       <ContactPagination
         currentPage={datacontact?.current_page || 0}

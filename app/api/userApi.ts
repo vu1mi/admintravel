@@ -3,6 +3,22 @@ const API_BASE_URL =
 
 const USERS_ENDPOINT = `${API_BASE_URL}/users`;
 
+// Handle API response errors
+const handleResponse = async (res: Response) => {
+  if (res.status === 401) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
+  if (res.status === 403) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/not-found";
+    }
+    throw new Error("Forbidden");
+  }
+};
+
 export interface UserDetail {
   id: number;
   name: string;
@@ -53,9 +69,11 @@ export const deleteUsers = async (ids: number[]) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(ids),
   });
 
+  await handleResponse(res);
   if (!res.ok) {
     const message = await res.text();
     throw new Error(message || "Delete users failed");
@@ -70,9 +88,11 @@ export const updateUser = async (id: number, payload: UpdateUserPayload) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
+  await handleResponse(res);
   if (!res.ok) {
     const message = await res.text();
     throw new Error(message || "Update user failed");
@@ -82,7 +102,10 @@ export const updateUser = async (id: number, payload: UpdateUserPayload) => {
 };
 
 export const getUserById = async (id: number): Promise<UserDetail> => {
-  const res = await fetch(`${USERS_ENDPOINT}/${id}`);
+  const res = await fetch(`${USERS_ENDPOINT}/${id}`, {
+    credentials: "include",
+  });
+  await handleResponse(res);
   if (!res.ok) {
     const message = await res.text();
     throw new Error(message || "Get user failed");
@@ -113,9 +136,11 @@ export const changePassword = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
+  await handleResponse(res);
   if (!res.ok) {
     const message = await res.text();
     throw new Error(message || "Change password failed");
@@ -136,9 +161,13 @@ export const getUsersByRoleCode = async (
   params.append("limit", limit.toString());
 
   const res = await fetch(
-    `${USERS_ENDPOINT}/role/${roleCode}?${params.toString()}`
+    `${USERS_ENDPOINT}/role/${roleCode}?${params.toString()}`,
+    {
+      credentials: "include",
+    }
   );
 
+  await handleResponse(res);
   if (!res.ok) {
     throw new Error("Failed to get users by role code");
   }
@@ -154,9 +183,11 @@ export const createUser = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
+  await handleResponse(res);
   if (!res.ok) {
     const message = await res.text();
     throw new Error(message || "Create user failed");

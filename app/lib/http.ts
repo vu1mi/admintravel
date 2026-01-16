@@ -1,6 +1,4 @@
 import envConfig from "@/config";
-import { normalizePath } from "@/app/lib/utils";
-import { LoginResType } from "@/schemaValidations/auth.schema";
 import { redirect } from "next/navigation";
 
 type CustomOptions = Omit<RequestInit, "method"> & {
@@ -9,6 +7,7 @@ type CustomOptions = Omit<RequestInit, "method"> & {
 
 const ENTITY_ERROR_STATUS = 422;
 const AUTHENTICATION_ERROR_STATUS = 401;
+const FORBIDDEN_ERROR_STATUS = 403;
 
 type EntityErrorPayload = {
   message: string;
@@ -68,12 +67,6 @@ const request = async <Response>(
       : {
           "Content-Type": "application/json",
         };
-  if (isClient()) {
-    const sessionToken = localStorage.getItem("sessionToken");
-    if (sessionToken) {
-      baseHeaders.Authorization = `Bearer ${sessionToken}`;
-    }
-  }
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server
 
@@ -94,6 +87,7 @@ const request = async <Response>(
     } as any,
     body,
     method,
+    credentials: "include", // Send cookies with request
   });
   const payload: Response = await res.json();
   const data = {
@@ -118,40 +112,28 @@ const request = async <Response>(
             headers: {
               ...baseHeaders,
             } as any,
+            credentials: "include",
           });
           try {
             await clientLogoutRequest;
           } catch (error) {
           } finally {
-            localStorage.removeItem("sessionToken");
-            localStorage.removeItem("sessionTokenExpiresAt");
             clientLogoutRequest = null;
             location.href = "/login";
           }
         }
       } else {
-        const sessionToken = (options?.headers as any)?.Authorization.split(
-          "Bearer "
-        )[1];
-        redirect(`/logout?sessionToken=${sessionToken}`);
+        redirect(`/login`);
+      }
+    } else if (res.status === FORBIDDEN_ERROR_STATUS) {
+      // User doesn't have permission - redirect to 404 page
+      if (isClient()) {
+        location.href = "/not-found";
+      } else {
+        redirect("/not-found");
       }
     } else {
       throw new HttpError(data);
-    }
-  }
-  // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
-  if (isClient()) {
-    if (
-      ["auth/login", "auth/register"].some(
-        (item) => item === normalizePath(url)
-      )
-    ) {
-      const { token, expiresAt } = (payload as LoginResType).data;
-      localStorage.setItem("sessionToken", token);
-      localStorage.setItem("sessionTokenExpiresAt", expiresAt);
-    } else if ("auth/logout" === normalizePath(url)) {
-      localStorage.removeItem("sessionToken");
-      localStorage.removeItem("sessionTokenExpiresAt");
     }
   }
   return data;

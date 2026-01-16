@@ -1,6 +1,26 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api";
 
+// Handle API response errors
+const handleResponse = async (res: Response) => {
+  if (res.status === 401) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
+  if (res.status === 403) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/not-found";
+    }
+    throw new Error("Forbidden");
+  }
+  if (!res.ok) {
+    throw new Error("API request failed");
+  }
+  return res;
+};
+
 export interface BookingItem {
   id: number;
   tourId: number;
@@ -61,31 +81,28 @@ export const getBookings = async (
   if (dateTo) params.set("endDate", dateTo);
 
   const url = `${API_BASE_URL}/bookings/search?${params.toString()}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch bookings");
-  }
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+  await handleResponse(res);
   const data: BookingListResponse = await res.json();
   return data;
 };
 
 export const updateBookingPaymentStatus = async (
   id: number,
-  paymentStatus: number,
-  sessionToken: string
+  paymentStatus: number
 ) => {
   const url = `${API_BASE_URL}/bookings/${id}`;
   const res = await fetch(url, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${sessionToken}`,
     },
+    credentials: "include",
     body: JSON.stringify({ paymentStatus }),
   });
-  if (!res.ok) {
-    throw new Error("Failed to update booking payment status");
-  }
+  await handleResponse(res);
   const data: Booking = await res.json();
   return data;
 };

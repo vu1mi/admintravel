@@ -1,50 +1,7 @@
 // src/api/tourTypeApi.ts
 // Service để gọi API Tour Types từ backend Spring Boot
 
-import axios from "axios";
-
-// Lấy URL từ environment variables
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api";
-
-// Tạo axios instance
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Add request interceptor để thêm token (nếu có)
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("sessionToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor để handle errors
-api.interceptors.response.use(
-  (response) => {
-    console.log(`✅ API Success: ${response.config.url}`, response.data);
-    return response;
-  },
-  (error) => {
-    console.error(
-      `❌ API Error: ${error.config?.url}`,
-      error.response?.data || error.message
-    );
-    return Promise.reject(error);
-  }
-);
+import api from "@/app/lib/axios";
 
 // ============== TYPES ==============
 

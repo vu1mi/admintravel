@@ -68,7 +68,9 @@ export default function UsersPageClient() {
 
         // Use the new API to find only USER role
         const url = `${baseUrl}/users/role/USER?${params.toString()}`;
-        const res = await fetch(url);
+        const res = await fetch(url, {
+          credentials: "include",
+        });
         const data = await res.json();
         setDataUser(data);
       } catch (error) {

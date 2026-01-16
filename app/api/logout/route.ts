@@ -2,18 +2,11 @@
 import { cookies } from "next/headers";
 
 export async function POST() {
-  const cookieStore =await cookies();
+  const cookieStore = await cookies();
 
-  // Xóa token
-  cookieStore.set("sessionToken", "", {
-    path: "/",
-    maxAge: 0,
-  });
-
-  cookieStore.set("userId", "", {
-    path: "/",
-    maxAge: 0,
-  });
+  // Delete cookies - must match the same options used when setting
+  cookieStore.delete("sessionToken");
+  cookieStore.delete("userId");
 
   return Response.json({ message: "Đã logout" }, { status: 200 });
 }
